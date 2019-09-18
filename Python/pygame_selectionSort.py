@@ -12,10 +12,10 @@ from pygame.locals import *
 # メイン処理
 def main():
     sort_arr = [8, 6, 4, 5, 7, 3, 1, 2]
-    comp_arr = [0, 0, 0, 0, 0, 0, 0, 0]
+    sel_arr = [0, 0, 0, 0, 0, 0, 0, 0]
 
-    SORT_SPEED_MSEC = 1
-    CHECK_SPEED_MSEC = 0.4
+    SORT_SPEED_SEC = 1
+    CHECK_SPEED_SEC = 0.4
     start = False
 
     # pygame の初期化
@@ -34,19 +34,19 @@ def main():
     put_title(screen)
 
     # 盤面の更新
-    put_frame(screen, sort_arr, comp_arr)
+    put_frame(screen, sort_arr, sel_arr)
 
     # ここまでが初期処理で、ここからループし、画面をずっと表示する
     while (1):
 
         # 速度調整のsleep
-        time.sleep(CHECK_SPEED_MSEC)
+        time.sleep(CHECK_SPEED_SEC)
 
         # キー入力などのイベント処理
         start = event_proc()
         if start:
             # ソート開始
-            bubbleSort(screen, sort_arr, comp_arr, SORT_SPEED_MSEC)
+            selectionSort(screen, sort_arr, sel_arr, SORT_SPEED_SEC)
 
 
 # イベント処理
@@ -96,23 +96,23 @@ def get_block_img(index: int):
 def put_title(screen):
     # フォントの生成
     font = pygame.font.Font(None, 40)
-    screen.blit(font.render("Press SPACE KEY to start Bubble Sort", True, (0, 255, 0)), [60, 50])
+    screen.blit(font.render("Press SPACE KEY to start Selection Sort", True, (0, 255, 0)), [60, 50])
 
-    screen.blit(font.render("Comparison:", True, (0, 255, 0)), [60, 580])
+    screen.blit(font.render("Selection:", True, (0, 255, 0)), [60, 580])
     screen.blit(font.render("Swap:", True, (0, 255, 0)), [400, 580])
     # 画面を更新
     pygame.display.update()
 
 
 # 盤面の更新
-def put_frame(screen, sort_arr, comp_arr):
+def put_frame(screen, sort_arr, sel_arr):
     x = 1
     for a in sort_arr:
         block_img = get_block_img(int(a))
         screen.blit(block_img, (60 * x, 100))
         x += 1
     x = 1
-    for a in comp_arr:
+    for a in sel_arr:
         block_img = get_block_img(int(a))
         screen.blit(block_img, (60 * x, 500))
         x += 1
@@ -121,16 +121,16 @@ def put_frame(screen, sort_arr, comp_arr):
 
 
 # カウント表示用
-def put_count(screen, comp_count, swap_count):
+def put_count(screen, sel_count, swap_count):
     # フォントの生成
     font = pygame.font.Font(None, 40)
     # 前のスコアは黒で塗りつぶす
     block_img = get_block_img(0)
-    screen.blit(block_img, (250 , 580))
+    screen.blit(block_img, (220 , 580))
     screen.blit(block_img, (500 , 580))
 
-    score_img = font.render(str(comp_count), True, (255, 255, 0))
-    screen.blit(score_img, (250, 580))
+    score_img = font.render(str(sel_count), True, (255, 255, 0))
+    screen.blit(score_img, (220, 580))
 
     score_img = font.render(str(swap_count), True, (255, 255, 0))
     screen.blit(score_img, (500, 580))
@@ -138,63 +138,49 @@ def put_count(screen, comp_count, swap_count):
     pygame.display.update()
 
 
-# 比較対象をセット
-def set_comparison(comp_arr, t1, t2):
-    for i in range(0, len(comp_arr)):
-        if i == t1 or i == t2:
-            comp_arr[i] = -1
+# 選択対象をセット
+def set_selection(sel_arr, t):
+    for i in range(0, len(sel_arr)):
+        if i == t:
+            sel_arr[i] = -1
         else:
-            comp_arr[i] = 0
+            sel_arr[i] = 0
 
 
-# バブルソート
-def bubbleSort(screen, sort_arr, comp_arr, sort_speed):
+# 選択ソート
+def selectionSort(screen, sort_arr, sel_arr, sort_speed):
     # パラメータの配列の長さ
     n = len(sort_arr)
-    comp_count = 0
+    sel_count = 0
     swap_count = 0
 
-    # パラメータの配列の長さ分ループする
-    for i in range(n):
+    # パラメータの配列の長さ-1回ループする（最後の1つは自然に決まるので-1）
+    for i in range(n - 1):
 
-        swap = False # 入替フラグを初期化
+        # iの要素以降で一番小さい数のindexを選択し、iと入れ替える
+        sel_count += 1
+        num = sort_arr[i:].index(min(sort_arr[i:]))
+        # 比較対象をセット
+        set_selection(sel_arr, num + i)
 
-        # 要素をペアで順に比較する（ので-1）
-        # iが増えるたび、最後の要素から降順に値が決まっていく（-i）
-        for j in range(0, n - i - 1):
+        # 盤面の更新
+        put_frame(screen, sort_arr, sel_arr)
+        put_count(screen, sel_count, swap_count)
 
-            print(str(sort_arr[j]) + "と" + str(sort_arr[j + 1]) + "を比べる")
+        # 速度調整のsleep
+        time.sleep(sort_speed)
 
-            # 比較対象をセット
-            set_comparison(comp_arr, j, j + 1)
+        print(str(i) + "以降で一番小さい数は" + str(sort_arr[i + num]) + "で、")
+        sort_arr[i], sort_arr[i + num] = sort_arr[i + num], sort_arr[i]
+        print("入れ替えると" + str(sort_arr) + "になります")
+        swap_count += 1
 
-            # 盤面の更新
-            put_frame(screen, sort_arr, comp_arr)
+        # 盤面の更新
+        put_frame(screen, sort_arr, sel_arr)
+        put_count(screen, sel_count, swap_count)
 
-            comp_count += 1
-            put_count(screen, comp_count, swap_count)
-
-            # 速度調整のsleep
-            time.sleep(sort_speed)
-
-            if sort_arr[j] > sort_arr[j + 1]:
-                # 次の要素の値より大きかったら、入れ替える
-                sort_arr[j], sort_arr[j + 1] = sort_arr[j + 1], sort_arr[j]
-                # 入替が発生したので、trueにする
-                swap = True
-
-                # 盤面の更新
-                put_frame(screen, sort_arr, comp_arr)
-
-                swap_count += 1
-                put_count(screen, comp_count, swap_count)
-
-                # 速度調整のsleep
-                time.sleep(sort_speed)
-
-        if not swap:
-            # 一度も入替が発生しなかったので終了します
-            break
+        # 速度調整のsleep
+        time.sleep(sort_speed)
 
 
 # インポートされた時にプログラムが動かないように
