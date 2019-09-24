@@ -1,0 +1,28 @@
+body {
+  background: #efefef; /* 背景色 */
+}
+
+#btn {
+  width: 300px; /* 横幅 */
+  height: 300px; /* 高さ */
+  background: #ef454a; /* 背景色 */
+  border-radius: 50%; /* 角丸 */
+  margin: 30px auto 0; /* 上に30pxのマージン、左右は等間隔のマージン（中央寄せ） */
+  text-align: center; /* 文字の横位置を中央に */
+  line-height: 300px; /* 一行の高さ（heightと合わせると真ん中） */
+  color: #fff; /* 文字の色 */
+  font-size: 42px; /* フォントのサイズ */
+  font-weight: bold; /* フォントの太さ */
+  cursor: pointer; /* カーソルを指のマークに変更する */
+  box-shadow: 0 10px 0 #d1483e; /* 影をつけてボタンっぽく */
+  user-select: none; /* 文字を選択できないように */
+}
+
+#btn:hover {
+  opacity: 0.9; /* マウスが重なったらちょっと透明にする */
+}
+
+#btn.pressed {
+  box-shadow: 0 5px 0 #d1483e; /* クリックされたときに、ボタンが押されたようにみせる */
+  margin-top: 35px;
+}
