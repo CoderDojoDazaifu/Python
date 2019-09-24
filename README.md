@@ -10,4 +10,3 @@ CoderDojo 太宰府で使用する教材など
 This is under [MIT license].
 https://en.wikipedia.org/wiki/MIT_License
 https://ja.wikipedia.org/wiki/MIT_License
-
